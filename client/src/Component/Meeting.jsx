@@ -108,7 +108,7 @@ function Meeting() {
 
 
     React.useEffect(() => {
-        const s = socketIO.connect('https://client-google-meet-kqdf.vercel.app/');
+        const s = socketIO.connect('localhost:4000');
         console.log(s, "socket")
         s.on("connect", () => {
             setSocket(s);
