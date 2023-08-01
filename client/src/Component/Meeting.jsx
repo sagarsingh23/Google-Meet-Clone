@@ -108,7 +108,7 @@ function Meeting() {
 
 
     React.useEffect(() => {
-        const s = socketIO.connect('localhost:4000');
+        const s = socketIO.connect('https://a6fe-103-5-135-8.ngrok-free.app');
         console.log(s, "socket")
         s.on("connect", () => {
             setSocket(s);
