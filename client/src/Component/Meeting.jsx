@@ -108,7 +108,7 @@ function Meeting() {
 
 
     React.useEffect(() => {
-        const s = socketIO.connect('https://03af-106-51-81-179.ngrok-free.app');
+        const s = socketIO.connect('https://dd09-106-51-81-179.ngrok-free.app');
         console.log(s, "socket")
         s.on("connect", () => {
             setSocket(s);
@@ -123,99 +123,99 @@ function Meeting() {
                 setVideoStream(stream);
             });
 
-            s.on("localDescription", async ({ description }) => {
+            // s.on("localDescription", async ({ description }) => {
 
-                pc.setRemoteDescription(description);
-                pc.ontrack = (e) => {
-                    console.log(e)
-                    setRemoteVideoStream(new MediaStream([e.track]))
-                }
+            //     pc.setRemoteDescription(description);
+            //     pc.ontrack = (e) => {
+            //         console.log(e)
+            //         setRemoteVideoStream(new MediaStream([e.track]))
+            //     }
 
-                s.on("iceCandidate", ({ candidate }) => {
-                    pc.addIceCandidate(candidate)
-                });
+            //     s.on("iceCandidate", ({ candidate }) => {
+            //         pc.addIceCandidate(candidate)
+            //     });
 
-                pc.onicecandidate = ({ candidate }) => {
-                    s.emit("iceCandidateReply", { candidate });
-                }
+            //     pc.onicecandidate = ({ candidate }) => {
+            //         s.emit("iceCandidateReply", { candidate });
+            //     }
 
-                await pc.setLocalDescription(await pc.createAnswer());
-                s.emit("remoteDescription", { description: pc.localDescription });
-            });
+            //     await pc.setLocalDescription(await pc.createAnswer());
+            //     s.emit("remoteDescription", { description: pc.localDescription });
+            // });
 
-            s.on("remoteDescription", async ({ description }) => {
-                console.log({ description });
-                pc.setRemoteDescription(description)
-                pc.ontrack = (e) => {
-                    setRemoteVideoStream(new MediaStream([e.track]));
-                };
+            // s.on("remoteDescription", async ({ description }) => {
+            //     console.log({ description });
+            //     pc.setRemoteDescription(description)
+            //     pc.ontrack = (e) => {
+            //         setRemoteVideoStream(new MediaStream([e.track]));
+            //     };
 
-                s.on("iceCandidate", ({ candidate }) => {
-                    pc.addIceCandidate(candidate);
-                });
+            //     s.on("iceCandidate", ({ candidate }) => {
+            //         pc.addIceCandidate(candidate);
+            //     });
 
-                pc.onicecandidate = ({ candidate }) => {
-                    s.emit("iceCandidateReply", { candidate });
-                };
-            });
+            //     pc.onicecandidate = ({ candidate }) => {
+            //         s.emit("iceCandidateReply", { candidate });
+            //     };
+            // });
         });
     }, [])
 
-    // React.useEffect(() => {
-    //     if (!socket) return; // Ensure the socket is available
+    React.useEffect(() => {
+        if (!socket) return; // Ensure the socket is available
 
-    //     const handleLocalDescription = async ({ description }) => {
-    //         pc.setRemoteDescription(description);
-    //         pc.ontrack = (e) => {
-    //             console.log(e);
-    //             setRemoteVideoStream(new MediaStream([e.track]));
-    //         };
+        const handleLocalDescription = async ({ description }) => {
+            pc.setRemoteDescription(description);
+            pc.ontrack = (e) => {
+                console.log(e);
+                setRemoteVideoStream(new MediaStream([e.track]));
+            };
 
-    //         socket.on("iceCandidate", ({ candidate }) => {
-    //             pc.addIceCandidate(candidate);
-    //         });
+            socket.on("iceCandidate", ({ candidate }) => {
+                pc.addIceCandidate(candidate);
+            });
 
-    //         pc.onicecandidate = ({ candidate }) => {
-    //             socket.emit("iceCandidateReply", { candidate });
-    //         };
+            pc.onicecandidate = ({ candidate }) => {
+                socket.emit("iceCandidateReply", { candidate });
+            };
 
-    //         await pc.setLocalDescription(await pc.createAnswer());
-    //         socket.emit("remoteDescription", { description: pc.localDescription });
-    //     };
+            await pc.setLocalDescription(await pc.createAnswer());
+            socket.emit("remoteDescription", { description: pc.localDescription });
+        };
 
-    //     socket.on("localDescription", handleLocalDescription);
+        socket.on("localDescription", handleLocalDescription);
 
-    //     return () => {
-    //         socket.off("localDescription", handleLocalDescription); // Clean up the listener
-    //     };
-    // }, [socket]);
+        return () => {
+            socket.off("localDescription", handleLocalDescription); // Clean up the listener
+        };
+    }, [socket]);
 
-    // // This useEffect handles the remote description setup
-    // React.useEffect(() => {
-    //     if (!socket) return; // Ensure the socket is available
+    // This useEffect handles the remote description setup
+    React.useEffect(() => {
+        if (!socket) return; // Ensure the socket is available
 
-    //     const handleRemoteDescription = ({ description }) => {
-    //         console.log({ description });
-    //         pc.setRemoteDescription(description);
-    //         pc.ontrack = (e) => {
-    //             setRemoteVideoStream(new MediaStream([e.track]));
-    //         };
+        const handleRemoteDescription = ({ description }) => {
+            console.log({ description });
+            pc.setRemoteDescription(description);
+            pc.ontrack = (e) => {
+                setRemoteVideoStream(new MediaStream([e.track]));
+            };
 
-    //         socket.on("iceCandidate", ({ candidate }) => {
-    //             pc.addIceCandidate(candidate);
-    //         });
+            socket.on("iceCandidate", ({ candidate }) => {
+                pc.addIceCandidate(candidate);
+            });
 
-    //         pc.onicecandidate = ({ candidate }) => {
-    //             socket.emit("iceCandidateReply", { candidate });
-    //         };
-    //     };
+            pc.onicecandidate = ({ candidate }) => {
+                socket.emit("iceCandidateReply", { candidate });
+            };
+        };
 
-    //     socket.on("remoteDescription", handleRemoteDescription);
+        socket.on("remoteDescription", handleRemoteDescription);
 
-    //     return () => {
-    //         socket.off("remoteDescription", handleRemoteDescription); // Clean up the listener
-    //     };
-    // }, [socket]);
+        return () => {
+            socket.off("remoteDescription", handleRemoteDescription); // Clean up the listener
+        };
+    }, [socket]);
 
     if (!videoStream) {
         return <div>
