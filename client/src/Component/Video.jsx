@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 
-export const Video = ({ stream }) => {
+export const Video = ({ stream , muted }) => {
     // console.log(stream, "video comp", stream ? stream.getTracks() : null)
     const videoRef = useRef();
     useEffect(() => {
@@ -12,7 +12,7 @@ export const Video = ({ stream }) => {
     return (
         <div>
             <div>
-                <video style={{ width: "100%", borderRadius: "10px" }} ref={videoRef} autoPlay={true} playsInline={true} />
+                <video style={{ width: "100%", borderRadius: "10px" }} ref={videoRef} muted={muted} autoPlay={true} playsInline={true} />
             </div>
         </div>
     )

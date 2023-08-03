@@ -308,7 +308,7 @@ function Meeting() {
                 <div style={{ backgroundColor: 'black', borderRadius: '10px', width: '30vw', height: '50vh', color: 'white' }}>
                     {
                         videoStream && videoStream.getVideoTracks()[0] ? (
-                            <Video stream={videoStream} />
+                            <Video muted={true} stream={videoStream} />
                         ) : (
                             <p style={{ height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}> Camera is off</p>
                         )
@@ -344,11 +344,11 @@ function Meeting() {
 
     return <Grid container spacing={2} alignContent={"center"} justifyContent={"center"}>
         <Grid item xs={12} md={6} lg={4}>
-            <Video stream={videoStream} />
+            <Video muted={true} stream={videoStream} />
         </Grid>
         {remoteVideoStream &&
             <Grid item xs={12} md={6} lg={4}>
-                <Video stream={remoteVideoStream} />
+                <Video muted={false} stream={remoteVideoStream} />
             </Grid>
         }
     </Grid>
