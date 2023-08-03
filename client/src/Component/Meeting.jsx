@@ -164,12 +164,27 @@ function Meeting() {
     React.useEffect(() => {
         if (!socket) return; // Ensure the socket is available
 
+        // Create a new MediaStream object to hold all incoming tracks
+        const combinedRemoteStream = new MediaStream();
+
         const handleLocalDescription = async ({ description }) => {
             pc.setRemoteDescription(description);
             pc.ontrack = (e) => {
-                console.log(e);
-                setRemoteVideoStream(new MediaStream([e.track]));
+                console.log(e, "event")
+                combinedRemoteStream.addTrack(e.track);
+                setRemoteVideoStream(combinedRemoteStream);
             };
+            // pc.ontrack = (e) => {
+            //     console.log(e, "event1");
+            //     // setRemoteVideoStream(((remoteStream) => {
+            //     //   if(!remoteStream){
+            //     //     new MediaStream([e.track]);
+            //     //     console.log(new MediaStream(), "media stream")
+            //     //   }else{
+            //     //     console.log("comming in remote");
+            //     //   }
+            //     // }));
+            // };
 
             socket.on("iceCandidate", ({ candidate }) => {
                 pc.addIceCandidate(candidate);
@@ -196,9 +211,12 @@ function Meeting() {
 
         const handleRemoteDescription = ({ description }) => {
             console.log({ description });
+            const combinedRemoteStream = new MediaStream();
             pc.setRemoteDescription(description);
             pc.ontrack = (e) => {
-                setRemoteVideoStream(new MediaStream([e.track]));
+                console.log(e, "event")
+                combinedRemoteStream.addTrack(e.track);
+                setRemoteVideoStream(combinedRemoteStream);
             };
 
             socket.on("iceCandidate", ({ candidate }) => {
@@ -277,7 +295,9 @@ function Meeting() {
     }
 
 
-    console.log(videoStream, remoteVideoStream);
+    if (videoStream && remoteVideoStream)
+
+        console.log(videoStream.getTracks(), "video", remoteVideoStream.getTracks(), "remote");
 
 
 
