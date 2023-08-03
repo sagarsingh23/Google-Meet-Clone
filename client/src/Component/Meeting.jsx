@@ -263,7 +263,7 @@ function Meeting() {
             pc.addTrack(track);
         })
 
-        pc.onnegotiationneeded = async () => {
+        // pc.onnegotiationneeded = async () => {
             try {
                 await pc.setLocalDescription(await pc.createOffer());
                 console.log({ aa: pc.localDescription });
@@ -272,7 +272,7 @@ function Meeting() {
                 console.log({ msg: err?.message });
                 console.error(err);
             }
-        }
+        // }
         setMeetingJoined(true);
     }
 
