@@ -295,9 +295,13 @@ function Meeting() {
     }
 
 
-    if (videoStream && remoteVideoStream)
-
+    if (videoStream && remoteVideoStream) {
         console.log(videoStream.getTracks(), "video", remoteVideoStream.getTracks(), "remote");
+        console.log(videoStream.getAudioTracks()[0].getSettings().codec) , "video Codec";
+        console.log(remoteVideoStream.getAudioTracks()[0].getSettings().codec , "remote ccodec");
+
+    }
+
 
 
 
