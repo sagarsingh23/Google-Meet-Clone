@@ -1,7 +1,6 @@
 import { useEffect, useRef } from "react";
 
 export const Video = ({ stream , muted }) => {
-    // console.log(stream, "video comp", stream ? stream.getTracks() : null)
     const videoRef = useRef();
     useEffect(() => {
         if (videoRef && videoRef.current) {

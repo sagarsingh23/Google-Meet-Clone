@@ -48,17 +48,17 @@ function Meeting() {
     };
 
 
-    // const getUserStream = async () => {
-    //     try {
-    //         const localStream = await navigator.mediaDevices.getUserMedia({
-    //             audio: audio,
-    //             video: video
-    //         });
-    //         return localStream;
-    //     } catch (error) {
-    //         return null;
-    //     }
-    // };
+    const getUserStream = async () => {
+        try {
+            const localStream = await navigator.mediaDevices.getUserMedia({
+                audio: audio,
+                video: video
+            });
+            return localStream;
+        } catch (error) {
+            return null;
+        }
+    };
 
     // React.useEffect(() => {
     //     const fetchData = async () => {
@@ -108,83 +108,53 @@ function Meeting() {
 
 
     React.useEffect(() => {
-        const s = socketIO.connect('https://dd09-106-51-81-179.ngrok-free.app');
+        const s = socketIO.connect('localhost:4000');
         console.log(s, "socket")
         s.on("connect", () => {
             setSocket(s);
-            s.emit("join", {
-                meetingId
-            })
+            // s.emit("join", {
+            //     meetingId
+            // })
 
-            window.navigator.mediaDevices.getUserMedia({
-                video: true,
-                audio: true
-            }).then(async (stream) => {
-                setVideoStream(stream);
-            });
-
-            // s.on("localDescription", async ({ description }) => {
-
-            //     pc.setRemoteDescription(description);
-            //     pc.ontrack = (e) => {
-            //         console.log(e)
-            //         setRemoteVideoStream(new MediaStream([e.track]))
-            //     }
-
-            //     s.on("iceCandidate", ({ candidate }) => {
-            //         pc.addIceCandidate(candidate)
-            //     });
-
-            //     pc.onicecandidate = ({ candidate }) => {
-            //         s.emit("iceCandidateReply", { candidate });
-            //     }
-
-            //     await pc.setLocalDescription(await pc.createAnswer());
-            //     s.emit("remoteDescription", { description: pc.localDescription });
-            // });
-
-            // s.on("remoteDescription", async ({ description }) => {
-            //     console.log({ description });
-            //     pc.setRemoteDescription(description)
-            //     pc.ontrack = (e) => {
-            //         setRemoteVideoStream(new MediaStream([e.track]));
-            //     };
-
-            //     s.on("iceCandidate", ({ candidate }) => {
-            //         pc.addIceCandidate(candidate);
-            //     });
-
-            //     pc.onicecandidate = ({ candidate }) => {
-            //         s.emit("iceCandidateReply", { candidate });
-            //     };
+            // window.navigator.mediaDevices.getUserMedia({
+            //     video: true,
+            //     audio: true
+            // }).then(async (stream) => {
+            //     setVideoStream(stream);
             // });
         });
     }, [])
 
     React.useEffect(() => {
-        if (!socket) return; // Ensure the socket is available
+        console.log(socket, "socketcdhbcb")
+        if (socket) {
+            const fetchData = async () => {
+                socket.emit("join", {
+                    meetingId
+                })
+                const stream = await getUserStream();
+                if (stream) {
+                    setVideoStream(stream);
+                }
+            }
+            fetchData();
+        }
+    }, [socket, audio, video])
 
-        // Create a new MediaStream object to hold all incoming tracks
+
+    React.useEffect(() => {
+        if (!socket) return;
+
         const combinedRemoteStream = new MediaStream();
 
         const handleLocalDescription = async ({ description }) => {
-            pc.setRemoteDescription(description);
+            await pc.setRemoteDescription(description);
+
             pc.ontrack = (e) => {
                 console.log(e, "event")
                 combinedRemoteStream.addTrack(e.track);
                 setRemoteVideoStream(combinedRemoteStream);
             };
-            // pc.ontrack = (e) => {
-            //     console.log(e, "event1");
-            //     // setRemoteVideoStream(((remoteStream) => {
-            //     //   if(!remoteStream){
-            //     //     new MediaStream([e.track]);
-            //     //     console.log(new MediaStream(), "media stream")
-            //     //   }else{
-            //     //     console.log("comming in remote");
-            //     //   }
-            //     // }));
-            // };
 
             socket.on("iceCandidate", ({ candidate }) => {
                 pc.addIceCandidate(candidate);
@@ -201,20 +171,19 @@ function Meeting() {
         socket.on("localDescription", handleLocalDescription);
 
         return () => {
-            socket.off("localDescription", handleLocalDescription); // Clean up the listener
+            socket.off("localDescription", handleLocalDescription);
         };
     }, [socket]);
 
-    // This useEffect handles the remote description setup
     React.useEffect(() => {
-        if (!socket) return; // Ensure the socket is available
+        if (!socket) return;
 
-        const handleRemoteDescription = ({ description }) => {
+        const handleRemoteDescription = async ({ description }) => {
             console.log({ description });
             const combinedRemoteStream = new MediaStream();
-            pc.setRemoteDescription(description);
+
+            await pc.setRemoteDescription(description);
             pc.ontrack = (e) => {
-                console.log(e, "event")
                 combinedRemoteStream.addTrack(e.track);
                 setRemoteVideoStream(combinedRemoteStream);
             };
@@ -231,15 +200,15 @@ function Meeting() {
         socket.on("remoteDescription", handleRemoteDescription);
 
         return () => {
-            socket.off("remoteDescription", handleRemoteDescription); // Clean up the listener
+            socket.off("remoteDescription", handleRemoteDescription);
         };
     }, [socket]);
 
-    if (!videoStream) {
-        return <div>
-            Loading...
-        </div>
-    }
+    // if (!videoStream) {
+    //     return <div>
+    //         Loading...
+    //     </div>
+    // }
 
 
 
@@ -344,11 +313,27 @@ function Meeting() {
 
     return <Grid container spacing={2} alignContent={"center"} justifyContent={"center"}>
         <Grid item xs={12} md={6} lg={4}>
-            <Video muted={true} stream={videoStream} />
+            {
+                videoStream && videoStream.getVideoTracks()[0] ? (
+                    <Video muted={false} stream={videoStream} />
+                ) : (
+                    <div style={{ backgroundColor: 'black', borderRadius: '10px', width: '30vw', height: '50vh', color: 'white' }}>
+                        <p style={{ height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}> Camera is off</p>
+                    </div>
+                )
+            }
         </Grid>
         {remoteVideoStream &&
             <Grid item xs={12} md={6} lg={4}>
-                <Video muted={false} stream={remoteVideoStream} />
+                {
+                    remoteVideoStream.getVideoTracks()[0] ? (
+                        <Video muted={false} stream={remoteVideoStream} />
+                    ) : (
+                        <div style={{ backgroundColor: 'black', borderRadius: '10px', width: '30vw', height: '50vh', color: 'white' }}>
+                            <p style={{ height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}> Camera is off</p>
+                        </div>
+                    )
+                }
             </Grid>
         }
     </Grid>
