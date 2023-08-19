@@ -9,3 +9,26 @@
     font-size : 2em;
     margin-right: 10px;
 }
+
+.test {
+    color: rgb(73, 72, 72);
+}
+
+
+.create-meeting-list-items{
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    padding : 0px 8px;
+    height : 48px;
+}
+
+.create-meeting-item{
+ padding: 0px 20px 0px 10px;
+ font-size: 22px;
+}
+
+li:hover{
+    background-color:  rgb(241, 240, 240);
+}
+

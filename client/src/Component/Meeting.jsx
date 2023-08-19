@@ -9,6 +9,8 @@ import {
     BsMic,
     BsMicMute
 } from 'react-icons/bs'
+import { useRecoilState } from 'recoil';
+import { meetingJoinedState } from '../store/meetingAtoms';
 
 let pc = new RTCPeerConnection({
     iceServers: [
@@ -24,14 +26,13 @@ function Meeting() {
 
     const [video, setVideo] = React.useState(false)
     const [audio, setAudio] = React.useState(false)
-
-
     const [socket, setSocket] = React.useState(false);
-    const [meetingJoined, setMeetingJoined] = React.useState(false);
     const [videoStream, setVideoStream] = React.useState()
     const [remoteVideoStream, setRemoteVideoStream] = React.useState();
 
-    // const videoStreamRef = React.useRef(null);
+    const [meetingJoined, setMeetingJoined] = useRecoilState(meetingJoinedState);
+
+    // const [meetingJoined, setMeetingJoined] = React.useState(false);
 
     const params = useParams();
     const meetingId = params.meetingId;
@@ -48,67 +49,8 @@ function Meeting() {
     };
 
 
-    // const getUserStream = async () => {
-    //     try {
-    //         const localStream = await navigator.mediaDevices.getUserMedia({
-    //             audio: audio,
-    //             video: video
-    //         });
-    //         return localStream;
-    //     } catch (error) {
-    //         return null;
-    //     }
-    // };
-
-    // React.useEffect(() => {
-    //     const fetchData = async () => {
-    //         const stream = await getUserStream();
-    //         if (stream) {
-    //             videoStreamRef.current = stream;
-    //             setVideoStream(stream);
-    //             stream.onremovetrack = () => {
-    //                 console.log("stream ended!!");
-    //             };
-    //         } else {
-    //             setVideoStream(null);
-    //         }
-    //     };
-
-    //     fetchData();
-    //     // await pc.setLocalDescription(await pc.createAnswer());
-    //     // s.emit("remoteDescription", { description: pc.localDescription });
-    //     // let pc = new RTCPeerConnection({
-    //     //     iceServers: [
-    //     //         {
-    //     //             urls: "stun:stun.l.google.com:19302",
-    //     //         },
-    //     //     ]
-    //     // })
-
-    //     // pc.setRemoteDescription(description);
-    //     // pc.ontrack = (e) => {
-    //     //     setRemoteVideoStream(new MediaStream[e.track])
-    //     // }
-
-    //     // s.on("iceCandidate", ({ candidate }) => {
-    //     //     pc.addIceCandidate(candidate)
-    //     // })
-
-    //     // pc.onicecandidate = ({ candidate }) => {
-    //     //     s.emit("iceCandidateReply", { candidate });
-    //     // }
-
-    //     // const pcDescription = await pc.createAnswer();
-    //     // await pc.setLocalDescription(pcDescription);
-    //     // s.emit("remoteDescription", { description: pc.localDescription })
-
-
-
-    // }, [audio, video]);
-
-
     React.useEffect(() => {
-        const s = socketIO.connect('https://dd09-106-51-81-179.ngrok-free.app');
+        const s = socketIO.connect('https://7709-2406-b400-60-721b-d70b-1627-56d9-ed66.ngrok-free.app');
         console.log(s, "socket")
         s.on("connect", () => {
             setSocket(s);
@@ -122,42 +64,6 @@ function Meeting() {
             }).then(async (stream) => {
                 setVideoStream(stream);
             });
-
-            // s.on("localDescription", async ({ description }) => {
-
-            //     pc.setRemoteDescription(description);
-            //     pc.ontrack = (e) => {
-            //         console.log(e)
-            //         setRemoteVideoStream(new MediaStream([e.track]))
-            //     }
-
-            //     s.on("iceCandidate", ({ candidate }) => {
-            //         pc.addIceCandidate(candidate)
-            //     });
-
-            //     pc.onicecandidate = ({ candidate }) => {
-            //         s.emit("iceCandidateReply", { candidate });
-            //     }
-
-            //     await pc.setLocalDescription(await pc.createAnswer());
-            //     s.emit("remoteDescription", { description: pc.localDescription });
-            // });
-
-            // s.on("remoteDescription", async ({ description }) => {
-            //     console.log({ description });
-            //     pc.setRemoteDescription(description)
-            //     pc.ontrack = (e) => {
-            //         setRemoteVideoStream(new MediaStream([e.track]));
-            //     };
-
-            //     s.on("iceCandidate", ({ candidate }) => {
-            //         pc.addIceCandidate(candidate);
-            //     });
-
-            //     pc.onicecandidate = ({ candidate }) => {
-            //         s.emit("iceCandidateReply", { candidate });
-            //     };
-            // });
         });
     }, [])
 
@@ -174,17 +80,6 @@ function Meeting() {
                 combinedRemoteStream.addTrack(e.track);
                 setRemoteVideoStream(combinedRemoteStream);
             };
-            // pc.ontrack = (e) => {
-            //     console.log(e, "event1");
-            //     // setRemoteVideoStream(((remoteStream) => {
-            //     //   if(!remoteStream){
-            //     //     new MediaStream([e.track]);
-            //     //     console.log(new MediaStream(), "media stream")
-            //     //   }else{
-            //     //     console.log("comming in remote");
-            //     //   }
-            //     // }));
-            // };
 
             socket.on("iceCandidate", ({ candidate }) => {
                 pc.addIceCandidate(candidate);
@@ -240,34 +135,6 @@ function Meeting() {
             Loading...
         </div>
     }
-
-
-
-    // React.useEffect(() => {
-    //     if (videoStream) {
-    //         // console.log(videoStream.getTracks(), "videoStream", video, audio)
-    //         if (!video && audio) {
-    //             // console.log("video disabling")
-    //             videoStream.getTracks().forEach((track) => {
-    //                 if (track.readyState === "live" && track.kind === "video") {
-    //                     track.stop();
-    //                 }
-    //             });
-    //         } else if (!audio && video) {
-    //             // console.log("audio disabling")
-    //             videoStream.getTracks().forEach((track) => {
-    //                 if (track.readyState === "live" && track.kind === "audio") {
-    //                     track.stop();
-    //                 }
-    //             });
-    //         } else if (!audio && !video) {
-    //             // console.log("disabling both audio and video ")
-    //             videoStream.getTracks().forEach((track) => {
-    //                 track.stop();
-    //             });
-    //         }
-    //     }
-    // }, [videoStream, video, audio])
 
 
     async function startMeeting() {
